@@ -1,4 +1,4 @@
-@echo on
+@echo off
 setlocal enabledelayedexpansion
 
 set URL="https://localhost/ie_index.htm"
