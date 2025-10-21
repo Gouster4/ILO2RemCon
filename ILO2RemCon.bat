@@ -1,9 +1,13 @@
-@echo off
+@echo on
 setlocal enabledelayedexpansion
 
+set URL="https://localhost/ie_index.htm"
 set CONFIG_FILE=config.properties
 set ILO_SCRIPT=bin\ILO2RemCon.bat
+set SITE_LIST_PATH="https://raw.githubusercontent.com/Gouster4/ILO2RemCon/refs/heads/main/iemode.xml"
 
+cd %~dp0
+taskkill /f /im msedge.exe >nul 2>&1
 :: Check if config file exists
 if not exist "%CONFIG_FILE%" (
     echo Config file not found. Creating new configuration...
@@ -87,12 +91,29 @@ echo.
 
 :: Use Plink with -no-antispoof to automatically start session
 echo Using Plink for SSH tunnel with password authentication...
-start "SSH Tunnel" /B plink -ssh -N -pw "%clean_sshpass%" -no-antispoof -L 443:%clean_ip%:443 -L 17990:%clean_ip%:17990 -L 17988:%clean_ip%:17988 -L 22:%clean_ip%:22 -L 23:%clean_ip%:23 %clean_ssh%
+start "SSH Tunnel" /B plink -ssh -N -pw "%clean_sshpass%" -no-antispoof -L 443:%clean_ip%:443 -L 17990:%clean_ip%:17990 -L 17988:%clean_ip%:17988 -L 22:%clean_ip%:22 -L 23:%clean_ip%:23 %clean_ssh% -L 3389:%clean_ip%:3389 %clean_ssh%
 
 :: Wait a moment for tunnel to establish
 echo Waiting for SSH tunnel to establish...
 timeout /t 3 /nobreak >nul
 echo Ports forwarded from %clean_ip% to localhost: 443, 17990, 17988, 22, 23
+
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v SecureProtocols /t REG_DWORD /d 0xA80 /f >nul 2>&1
+IF ERRORLEVEL 1 (
+    goto :SKIPEDGE
+)
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v InternetExplorerIntegrationSiteList /t REG_SZ /d "%SITE_LIST_PATH%" /f >nul 2>&1
+IF ERRORLEVEL 1 (
+    goto :SKIPEDGE
+)
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v InternetExplorerIntegrationLevel /t REG_DWORD /d "1" /f >nul 2>&1
+IF ERRORLEVEL 1 (
+    goto :SKIPEDGE
+)
+gpupdate /force
+timeout /t 3 /nobreak >nul
+start "iLO 2" /B "msedge.exe" "%URL%"
+:SKIPEDGE
 
 :: Check if ILO script exists and run it
 if exist "%ILO_SCRIPT%" (

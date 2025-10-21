@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site-list version="1">
+  <site url="https://localhost/ie_index.htm">
+    <compat-mode>Default</compat-mode>
+    <open-in>IE11</open-in>
+  </site>
+</site-list>
+

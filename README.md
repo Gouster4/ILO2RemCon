@@ -12,6 +12,14 @@ Then iLO 2 ip is specified and remote cosole connects to iLO 2 ip troght SSH con
 
 SSH tunnel is being created using plink.exe (PuTTY) https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
 
+# Usage
+Run ILO2RemCon.bat as user to open Remote Console.
+
+Run ILO2RemCon.bat as admin to open Remote Console and iLO 2 website.
+
+# Why website needs admin access
+To set IE mode for iLO 2 url and enable TLS 1.0.
+
 # Warning
 Passwords are stored in plain text!
 
